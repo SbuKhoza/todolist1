@@ -1,0 +1,15 @@
+import Signup from './Signup';
+import Home from './Home';
+import './App.css';
+
+
+function App() {
+  return (
+    <div className="App">
+      <Home/>
+      <Signup />
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,29 @@
+
+.container {
+    height: 100vh;
+    border: 1px solid black;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+    grid-template-areas: 'image-cont';
+}
+
+
+.image-cont {
+    background-color: rgb(48, 69, 77);
+    height: 100vh;
+    width: 100%;
+}
+
+.image-cont img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.form-cont {
+    background-color: rgba(205, 247, 248, 0.404);
+    height: 100vh;
+    width: 100%;
+}

@@ -1,0 +1,55 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
+import './Sign.css';
+
+function Log() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    const handleLogin = (event) => {
+        event.preventDefault();
+
+        axios
+            .get('http://localhost:3000/users', {
+                params: {
+                    username: username,
+                    password: password,
+                },
+            })
+            .then((response) => {
+                if (response.data.length > 0) { 
+                    navigate('/home');
+                } else {
+                    alert('Invalid Credentials');
+                }
+            })
+            .catch((error) => {
+                console.error('There was an error!', error);
+                alert('Error occurred while logging in');
+            });
+
+        console.log(username, password);
+        setUsername('');
+        setPassword('');
+    };
+
+    return (
+        <div className="container">
+            <h1>Login</h1>
+            <div className="lform">
+                <form onSubmit={handleLogin}>
+                    <label htmlFor="uname"><b>Username</b></label><br />
+                    <input type="text" placeholder="Enter Username" name="uname" required value={username} onChange={(e) => setUsername(e.target.value)} /><br />
+                    <label htmlFor="psw"><b>Password</b></label><br />
+                    <input type="password" placeholder="Enter Password" name="psw" required value={password} onChange={(e) => setPassword(e.target.value)} /><br />
+                    <button type="submit">Login</button>
+                    <p>Don't have an account? <a href="/signup">Sign up</a></p>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+export default Log;

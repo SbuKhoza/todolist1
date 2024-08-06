@@ -1,0 +1,16 @@
+body {
+  background-image: url(../public/dark.jpg)
+  
+}
+
+body img{
+  object-fit: cover;
+}
+
+.App {
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+}
+
+

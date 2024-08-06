@@ -1,0 +1,40 @@
+.container {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    ba
+}
+
+.lform {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+form input {
+    width: 50%;
+    height: 40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+form button {
+    width: 120px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-style: oblique;
+    font-weight:bolder;
+}
+
+.lform h1{
+    font-size: 35px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.lform label {
+    color: whitesmoke;
+    font-size: x-large;
+}
