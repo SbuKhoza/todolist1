@@ -1,11 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Home.css';
-import Paper from "@mui/material/Paper";
-import InputBase from "@mui/material/InputBase";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import {
+    Box,
+    Container,
+    Typography,
+    Button,
+    TextField,
+    Grid,
+    Paper,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Avatar,
+    Card,
+    CardContent,
+    CardActions,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    Drawer,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    useTheme,
+    useMediaQuery
+} from '@mui/material';
+import {
+    Add as AddIcon,
+    Search as SearchIcon,
+    Delete as DeleteIcon,
+    Edit as EditIcon,
+    Check as CheckIcon,
+    Menu as MenuIcon,
+    ExitToApp as LogoutIcon,
+    Assignment as TaskIcon
+} from '@mui/icons-material';
 
 function Home() {
     const [showFields, setShowFields] = useState(false);
@@ -14,24 +46,50 @@ function Home() {
     const [taskDate, setTaskDate] = useState('');
     const [taskTime, setTaskTime] = useState('');
     const [taskPriority, setTaskPriority] = useState('low');
-    const [dropdownVisible, setDropdownVisible] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [searchText, setSearchText] = useState('');
-    const [username, setUsername] = useState('');  
+    const [username, setUsername] = useState('');
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const loginUsername = searchParams.get('username');
 
     useEffect(() => {
-        const storedUsername = localStorage.getItem('username');
-        if (storedUsername) {
-            setUsername(storedUsername);
+        // Fetch user data from JSON server
+        if (loginUsername) {
+            axios.get(`http://localhost:3001/users?username=${loginUsername}`)
+                .then(response => {
+                    if (response.data.length > 0) {
+                        setUsername(response.data[0].username);
+                    } else {
+                        console.error('User not found');
+                        navigate('/');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    navigate('/');
+                });
+        } else {
+            // If no username in URL, redirect to login
+            navigate('/');
         }
-    }, []);
+    }, [loginUsername, navigate]);
 
-    const handleButtonClick = () => {
+    const handleLogout = () => {
+        navigate('/');
+    };
+
+    // Rest of your existing code remains the same
+    const handleAddTask = () => {
         setShowFields(true);
     };
 
-    const handleSaveClick = () => {
+    const handleSaveTask = () => {
         if (taskText && taskDate && taskTime && taskPriority) {
             const newTask = {
                 text: taskText,
@@ -41,7 +99,15 @@ function Home() {
                 completed: false
             };
 
-            setTasks([...tasks, newTask]);
+            if (editingIndex !== null) {
+                const newTasks = [...tasks];
+                newTasks[editingIndex] = newTask;
+                setTasks(newTasks);
+                setEditingIndex(null);
+            } else {
+                setTasks([...tasks, newTask]);
+            }
+
             setTaskText('');
             setTaskDate('');
             setTaskTime('');
@@ -50,203 +116,292 @@ function Home() {
         }
     };
 
-    const handleClearClick = () => {
-        setTaskText('');
-        setTaskDate('');
-        setTaskTime('');
-        setTaskPriority('low');
-    };
-
-    const handleTextChange = (e) => {
-        setTaskText(e.target.value);
-    };
-
-    const handleDateChange = (e) => {
-        setTaskDate(e.target.value);
-    };
-
-    const handleTimeChange = (e) => {
-        setTaskTime(e.target.value);
-    };
-
-    const handlePriorityChange = (e) => {
-        setTaskPriority(e.target.value);
-    };
-
-    const handleCompleteClick = (index) => {
-        const updatedTask = { ...tasks[index], completed: !tasks[index].completed };
-        const newTasks = tasks.map((task, i) => i === index ? updatedTask : task);
+    const handleCompleteTask = (index) => {
+        const newTasks = [...tasks];
+        newTasks[index].completed = !newTasks[index].completed;
         setTasks(newTasks);
     };
 
-    const handleDeleteClick = (index) => {
+    const handleDeleteTask = (index) => {
         const newTasks = tasks.filter((_, i) => i !== index);
         setTasks(newTasks);
     };
 
-    const handleEditClick = (index) => {
-        setEditingIndex(index);
+    const handleEditTask = (index) => {
         const task = tasks[index];
         setTaskText(task.text);
         setTaskDate(task.date);
         setTaskTime(task.time);
         setTaskPriority(task.priority);
+        setEditingIndex(index);
         setShowFields(true);
     };
 
-    const toggleDropdown = () => {
-        setDropdownVisible(!dropdownVisible);
+    const getPriorityColor = (priority) => {
+        switch (priority) {
+            case 'high':
+                return theme.palette.error.light;
+            case 'medium':
+                return theme.palette.warning.light;
+            default:
+                return theme.palette.success.light;
+        }
     };
 
-    const handleSearchTextChange = (e) => {
-        setSearchText(e.target.value);
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('username'); 
-        navigate('/'); 
-    };
-
-    const filteredTasks = tasks.filter(task => 
+    const filteredTasks = tasks.filter(task =>
         task.text.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    return (
-        <div className="maincont">
-            <div className="dash">
-                <div className='logo'>
-                    <img src='todo-logo.png' alt='logo'></img>
-                </div>
-                <div className='profile'></div>
-                <div className='proname'>
-                    <h3>{username}</h3>
-                </div>
-                <div className='calen'></div>
-                <div className='logout'>
-                    <button className='logoutbtn' onClick={handleLogout}>Logout</button>
-                </div>
-                <button className="hamburger" onClick={toggleDropdown}>
-                    ☰
-                </button>
-            </div>
+    const drawer = (
+        <Box sx={{ width: 250 }}>
+            <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    Todo App
+                </Typography>
+                <Avatar
+                    sx={{ 
+                        width: 80, 
+                        height: 80, 
+                        mb: 2,
+                        bgcolor: 'whitesmoke', 
+                        mt: 5,
+                        color: '#212121',
+                    }}
+                >
+                    {username ? username.charAt(0).toUpperCase() : ''}
+                </Avatar>
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                    {username}
+                </Typography>
+            </Box>
+            <List>
+                <ListItem>
+                    <ListItemIcon>
+                        <TaskIcon sx={{ color: 'whitesmoke' }}/>
+                    </ListItemIcon>
+                    <ListItemText primary="Tasks" />
+                </ListItem>
+                <ListItem button onClick={handleLogout}>
+                    <ListItemIcon>
+                        <LogoutIcon sx={{ color: 'whitesmoke' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                </ListItem>
+            </List>
+        </Box>
+    );
 
-            {dropdownVisible && (
-                <div className='dropdown-menu'>
-                    <div className='profile-dropdown'></div>
-                </div>
+    // Rest of your component remains the same
+    return (
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'grey.200' }}>
+            {!isMobile && (
+                <Drawer
+                    variant="permanent"
+                    sx={{
+                        width: 250,
+                        flexShrink: 0,
+                        '& .MuiDrawer-paper': {
+                            width: 250,
+                            boxSizing: 'border-box',
+                            bgcolor: '#212121',
+                            color: 'whitesmoke',
+                        },
+                    }}
+                >
+                    {drawer}
+                </Drawer>
             )}
 
-            <div className='content'>
-                <div className='top'>    
-                    <h1>Your Tasks</h1>
+            <Drawer
+                variant="temporary"
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                sx={{
+                    display: { xs: 'block', sm: 'none' },
+                    '& .MuiDrawer-paper': { width: 250 },
+                }}
+            >
+                {drawer}
+            </Drawer>
 
-                    <Paper
-                      component="form"
-                      sx={{
-                        p: "2px 4px",
-                        display: "flex",
-                        alignItems: "center",
-                        width: 400,
-                      }}
-                    >
-                      <InputBase
-                        sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search Tasks"
-                        inputProps={{ "aria-label": "search Tasks" }}
-                        onChange={handleSearchTextChange}
-                        value={searchText}
-                      />
-                      <IconButton type="button" sx={{ p: "10px" }} aria-label="search">
-                        <SearchIcon />
-                      </IconButton>
-                      <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                    </Paper>
+            <Box sx={{ flexGrow: 1 }}>
+                <AppBar position="static" sx={{ bgcolor: 'grey.200', boxShadow: 'none' }}>
+                    <Toolbar>
+                        {isMobile && (
+                            <IconButton
+                                color="inherit"
+                                edge="start"
+                                onClick={() => setDrawerOpen(true)}
+                                sx={{ mr: 2 }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                        )}
+                        
+                        <TextField
+                            size="small"
+                            placeholder="Search tasks..."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            sx={{ 
+                                mr: 2,
+                                bgcolor: 'background.paper',
+                                borderRadius: 1,
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 1,
+                                }
+                            }}
+                            InputProps={{
+                                endAdornment: <SearchIcon />,
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={handleAddTask}
+                            color="secondary"
+                        >
+                            Add Task
+                        </Button>
+                    </Toolbar>
+                </AppBar>
 
-                    <div className='task'>
-                        <button type="button" className='btn-task' onClick={handleButtonClick}>ADD</button>
-                    </div>
-                </div>
-
-                <div className='mainn'>
+                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                     {showFields && (
-                        <div className='field'>
-                            <div className='field-row'>
-                                <input type='text' placeholder='Add a new task...' value={taskText} onChange={handleTextChange}></input>
-                            </div>
-                            <div className='field-row'>
-                                <input type='date' value={taskDate} onChange={handleDateChange}></input>
-                                <input type='time' placeholder='HH:mm' value={taskTime} onChange={handleTimeChange}></input>
-                                <select id='dropdown' name='priority' value={taskPriority} onChange={handlePriorityChange}>
-                                    <option value='low'>Low</option>
-                                    <option value='medium'>Medium</option>
-                                    <option value='high'>High</option>
-                                </select>
-                            </div>
-                            <div className='field-row'>
-                                <button type='button' className='bbtn' onClick={handleSaveClick}>Save</button>
-                                <button type='button' className='bbtn' onClick={handleClearClick}>Clear</button>
-                            </div>
-                        </div>
+                        <Paper sx={{ p: 2, mb: 3 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Task Description"
+                                        value={taskText}
+                                        onChange={(e) => setTaskText(e.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        fullWidth
+                                        type="date"
+                                        label="Date"
+                                        value={taskDate}
+                                        onChange={(e) => setTaskDate(e.target.value)}
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        fullWidth
+                                        type="time"
+                                        label="Time"
+                                        value={taskTime}
+                                        onChange={(e) => setTaskTime(e.target.value)}
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <FormControl fullWidth>
+                                        <InputLabel>Priority</InputLabel>
+                                        <Select
+                                            value={taskPriority}
+                                            label="Priority"
+                                            onChange={(e) => setTaskPriority(e.target.value)}
+                                        >
+                                            <MenuItem value="low">Low</MenuItem>
+                                            <MenuItem value="medium">Medium</MenuItem>
+                                            <MenuItem value="high">High</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleSaveTask}
+                                            startIcon={<CheckIcon />}
+                                        >
+                                            Save
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={() => setShowFields(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Box>
+                                </Grid>
+                            </Grid>
+                        </Paper>
                     )}
 
-                    {filteredTasks.map((task, index) => (
-                        <div key={index} className='field'>
-                            <div className='field-row'>
-                                <input
-                                    type='text'
-                                    value={editingIndex === index ? taskText : task.text}
-                                    readOnly={editingIndex !== index}
-                                    className={task.completed ? 'complete' : ''}
-                                    onChange={editingIndex === index ? handleTextChange : null}
-                                />
-                            </div>
-                            <div className='field-row'>
-                                <input
-                                    type='date'
-                                    value={editingIndex === index ? taskDate : task.date}
-                                    readOnly={editingIndex !== index}
-                                    onChange={editingIndex === index ? handleDateChange : null}
-                                />
-                                <input
-                                    type='time'
-                                    value={editingIndex === index ? taskTime : task.time}
-                                    readOnly={editingIndex !== index}
-                                    onChange={editingIndex === index ? handleTimeChange : null}
-                                />
-                                <select id='dropdown' name='priority' value={task.priority} readOnly={editingIndex !== index} onChange={editingIndex === index ? handlePriorityChange : null}>
-                                    <option value='low'>Low</option>
-                                    <option value='medium'>Medium</option>
-                                    <option value='high'>High</option>
-                                </select>
-                            </div>
-                            <div className='field-row'>
-                                <button
-                                    type='button'
-                                    className='bbtn2'
-                                    onClick={() => handleCompleteClick(index)}
+                    <Grid container spacing={3}>
+                        {filteredTasks.map((task, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                                <Card 
+                                    sx={{ 
+                                        height: '100%',
+                                        borderLeft: 6,
+                                        borderColor: getPriorityColor(task.priority)
+                                    }}
                                 >
-                                    Complete
-                                </button>
-                                <button
-                                    type='button'
-                                    className='bbtn'
-                                    onClick={() => handleDeleteClick(index)}
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    type='button'
-                                    className='bbtn'
-                                    onClick={() => handleEditClick(index)}
-                                >
-                                    Edit
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>      
-        </div>
+                                    <CardContent>
+                                        <Typography
+                                            variant="h6"
+                                            component="div"
+                                            sx={{
+                                                textDecoration: task.completed ? 'line-through' : 'none',
+                                                color: task.completed ? 'text.secondary' : 'text.primary'
+                                            }}
+                                        >
+                                            {task.text}
+                                        </Typography>
+                                        <Typography color="text.secondary" sx={{ mt: 1 }}>
+                                            {task.date} at {task.time}
+                                        </Typography>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                display: 'inline-block',
+                                                px: 1,
+                                                py: 0.5,
+                                                borderRadius: 1,
+                                                bgcolor: getPriorityColor(task.priority),
+                                                mt: 1
+                                            }}
+                                        >
+                                            {task.priority.toUpperCase()}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardActions>
+                                        <Button
+                                            size="small"
+                                            startIcon={<CheckIcon />}
+                                            onClick={() => handleCompleteTask(index)}
+                                        >
+                                            {task.completed ? 'Undo' : 'Complete'}
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            startIcon={<EditIcon />}
+                                            onClick={() => handleEditTask(index)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            color="error"
+                                            startIcon={<DeleteIcon />}
+                                            onClick={() => handleDeleteTask(index)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Container>
+            </Box>
+        </Box>
     );
 }
 
