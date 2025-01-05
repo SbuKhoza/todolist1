@@ -1,70 +1,102 @@
-# Getting Started with Create React App
+Todo List Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a React-based Todo List Application with Material-UI for styling. It includes features like task management, search functionality, and user authentication (basic example).
 
-## Available Scripts
+Developer Information
 
-In the project directory, you can run:
+Name: Sibusiso Khoza
 
-### `npm start`
+GitHub Username: sbukhoza
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Email: sibusisok59@gmail.com
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Prerequisites
 
-### `npm test`
+Ensure you have the following installed on your machine before running the application:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Node.js (v14 or later) - Download Node.js
 
-### `npm run build`
+npm (comes with Node.js) or yarn for package management
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+JSON Server (globally installed) - Install it using the following command:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+npm install -g json-server
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Installation and Setup
 
-### `npm run eject`
+Clone the Repository:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+git clone https://github.com/sbukhoza/todolist.git
+cd todolist
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Install Dependencies:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+npm install
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Start the JSON Server:
+JSON Server is used to simulate a backend server for data storage. Run the following command:
 
-## Learn More
+json-server --watch db.json --port 3001
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Start the React Application:
+In another terminal window, start the client application:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+npm run client
 
-### Code Splitting
+Alternatively, you can run both the server and client concurrently:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+npm start
 
-### Analyzing the Bundle Size
+Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+src folder: Contains all the React components and application logic.
 
-### Making a Progressive Web App
+db.json: Mock database file for JSON Server.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+package.json: Project dependencies and scripts.
 
-### Advanced Configuration
+Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Add, Edit, Delete, and Complete Tasks: Manage tasks with priority levels (low, medium, high).
 
-### Deployment
+Search Tasks: Find tasks easily using the search bar.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Responsive Design: Adjusts seamlessly to different screen sizes using Material-UI.
 
-### `npm run build` fails to minify
+Dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The application uses the following major libraries:
+
+React: Frontend framework
+
+Material-UI: UI components and styling
+
+React Router: Navigation
+
+Axios: HTTP requests
+
+JSON Server: Simulated backend server
+
+Scripts
+
+Start the application:
+
+npm start
+
+Build for production:
+
+npm run build
+
+Run tests:
+
+npm test
+
+Contact
+
+For any questions or feedback, please contact:
+
+Email: sibusisok59@gmail.com
+
+GitHub: sbukhoza
+
+Thank you for using the Todo List Application!
